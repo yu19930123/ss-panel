@@ -4,5 +4,7 @@
 define('PUBLIC_PATH', __DIR__);
 
 // Bootstrap
-require PUBLIC_PATH.'/../bootstrap.php';
+$app = require PUBLIC_PATH.'/../bootstrap/app.php';
 
+// Run ButterFly!
+$app->run();

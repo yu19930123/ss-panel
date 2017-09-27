@@ -2,39 +2,54 @@
 
 namespace App\Controllers;
 
-use Smarty;
-
-use App\Services\Auth;
+use Slim\Http\Response;
+use App\Services\Factory;
+use Interop\Container\ContainerInterface;
+use Pongtan\Http\Controller;
+use Pongtan\View\ViewTrait;
+use App\Models\User;
 
 /**
- * BaseController
+ * BaseController.
  */
-
-class BaseController
+class BaseController extends Controller
 {
+    use ViewTrait;
 
-    public $view;
+    /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    public $logger;
 
-    public $smarty;
+    /**
+     * @var User
+     */
+    protected $user;
 
-    public function construct__(){
-
+    public function __construct(ContainerInterface $ci)
+    {
+        $this->logger = Factory::getLogger();
+        parent::__construct($ci);
     }
 
-    public function smarty(){
-        global $config;
-        $smarty=new smarty(); //实例化smarty
-        $smarty->settemplatedir(BASE_PATH.'/views/'.$config['theme'].'/'); //设置模板文件存放目录
-        $smarty->setcompiledir(BASE_PATH.'/storage/framework/smarty/compile/'); //设置生成文件存放目录
-        $smarty->setcachedir(BASE_PATH.'/storage/framework/smarty/cache/'); //设置缓存文件存放目录
-        // add config
-        $smarty->assign('config',$config);
-        $smarty->assign('user',Auth::getUser());
-        $this->smarty = $smarty;
-        return $smarty;
+    /**
+     * @return User
+     */
+    public function getUser()
+    {
+        return user();
     }
 
-    public function view(){
-        return $this->smarty();
+    /**
+     * @param Response $response
+     * @param $data
+     * @param int $statusCode
+     * @return mixed
+     */
+    public function echoJsonWithData(Response $response, $data = [], $statusCode = 200)
+    {
+        return $this->echoJson($response, [
+            'data' => $data,
+        ], $statusCode);
     }
 }
